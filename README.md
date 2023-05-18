@@ -115,32 +115,32 @@ export default {
 
 ```
 <template>
-	<view>
-		<smm-audio  :srcList='arrList'></smm-audio>
-	</view>
+    <view>
+        <smm-audio :srcList='arrList'></smm-audio>
+    </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				srcList: [{
-                  src: '音频真实地址',
-                  name: '音频名',
-                  singer: '作者名 & 系列名',
-                  imgSrc: '图片链接'
-                }]
-			};
-		},
-		onShow: function() {
-			console.log('App Show')
-			uni.$emit('onShow');
-		},
-		onHide: function() {
-			console.log('App Hide')
-			uni.$emit('onHide');
-		}
-	}
+export default {
+    data() {
+        return {
+            srcList: [{
+                src: '音频真实地址',
+                name: '音频名',
+                singer: '作者名 & 系列名',
+                imgSrc: '图片链接'
+            }]
+        };
+    },
+    onShow: function () {
+        console.log('App Show')
+        uni.$emit('onShow');
+    },
+    onHide: function () {
+        console.log('App Hide')
+        uni.$emit('onHide');
+    }
+}
 </script>
 ```
 #### 实现下次启动自动跳转到上次播放的音频
