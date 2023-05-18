@@ -1,3 +1,4 @@
+![img]([https://raw.githubusercontent.com/smmcat/SmmApi/main/img/img1.png](http://smmcat.cn/wp-content/uploads/2023/05/11-1.gif))
 ## 计划更新的内容
 
 - [x] 歌曲列表播放
@@ -8,7 +9,7 @@
 
 ## 组件介绍
 
-#### 基于 uni.createVideoContext() 创建的 video 实例
+### 基于 uni.createVideoContext() 创建的 video 实例
 
 解决了网络请求得到的音频地址无法播放的问题，索性发布了；
 
