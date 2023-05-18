@@ -1,9 +1,10 @@
 ## 计划更新的内容
 
--[x] 歌曲列表播放
--[x] 歌曲倍速播放
--[x] 歌曲后台播放
--[ ] 歌词列表同步播放
+- [x] 歌曲列表播放
+- [x] 歌曲倍速播放
+- [x] 歌曲后台播放
+- [x] 歌曲播放完成历史记录
+- [ ] 歌词列表同步播放
 
 ## 组件介绍
 
@@ -28,17 +29,19 @@
 | imgSrc    |  音频对应的图片             |
 |directory  |  是否显示歌曲目录列表 |
 |dirHight   |  歌曲目录列表展示高度 |
+|lastSongIndex   |  指定当前播放目录下标的音频 |
 
 ## 事件向外提供
 
 |事件名 |说明|
 |:-|:-:|
-	|  readyState   | 音频部署完成事件 - 可获取相关数据      |
-	|  play         | 音频开始播放事件                      |
-	|  pause        | 音频暂停播放事件                      |
-	|  timeupdate   | 音频持续播放事件                      |
-	|  error        | 音频加载失败事件                      |
-	|  ended        | 音频播放完成事件                      |
+|  readyState   | 音频部署完成事件 - 可获取相关数据      |
+|  play         | 音频开始播放事件                      |
+|  pause        | 音频暂停播放事件                      |
+|  timeupdate   | 音频持续播放事件                      |
+|  error        | 音频加载失败事件                      |
+|  ended        | 音频播放完成事件                      |
+|playChangeIndex|音频列表播放下标发生改变               |
 	
 	
 ## 使用演示
@@ -114,31 +117,103 @@ export default {
 
 ```
 <template>
-	<view>
-		<smm-audio  :srcList='arrList'></smm-audio>
-	</view>
+    <view>
+        <smm-audio :srcList='arrList'></smm-audio>
+    </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				srcList: [{
-                  src: '音频真实地址',
-                  name: '音频名',
-                  singer: '作者名 & 系列名',
-                  imgSrc: '图片链接'
-                }]
-			};
-		},
-		onShow: function() {
-			console.log('App Show')
-			uni.$emit('onShow');
-		},
-		onHide: function() {
-			console.log('App Hide')
-			uni.$emit('onHide');
-		}
-	}
+export default {
+    data() {
+        return {
+            srcList: [{
+                src: '音频真实地址',
+                name: '音频名',
+                singer: '作者名 & 系列名',
+                imgSrc: '图片链接'
+            }]
+        };
+    },
+    onShow: function () {
+        console.log('App Show')
+        uni.$emit('onShow');
+    },
+    onHide: function () {
+        console.log('App Hide')
+        uni.$emit('onHide');
+    }
+}
+</script>
+```
+#### 实现下次启动自动跳转到上次播放的音频
+```
+<template>
+  <view>
+    <smm-audio :srcList='arrList' :lastSongIndex='befoIndex' :directory="true" :dirHight="wh"
+      @playChangeIndex='storageIndex'></smm-audio>
+  </view>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      arrList: [],
+      wh: 0,
+      nowTime: 0,
+      // 上一个记录
+      befoIndex: 0
+    };
+  },
+  onLoad() {
+    // 获取设备信息
+    const info = uni.getSystemInfoSync();
+    // 为当前 可用高度对应变量进行赋值
+    this.wh = info.windowHeight - 100;
+  },
+  created() {
+    this.getSongList();
+  },
+  methods: {
+    getSongList() {
+      uni.request({
+        url: '网络请求接口',
+        method: 'GET',
+        success: ({
+          data: res
+        }) => {
+          this.arrList = res.map(function (item, index) {
+            let src = item.songUrl;
+            // let name = item.songName;
+            let name = `第 ${index + 1} 课`;
+            let singer = '张老师特别课程';
+            let imgSrc = 'xxx.jpg';
+            // 封装成 播放器支持的对象
+            return {
+              src,
+              name,
+              singer,
+              imgSrc
+            }
+          });
+          // 获取本地存储的最后播放的音频内容
+          const historyItem = JSON.parse(uni.getStorageSync('lastPlay') || '{}');
+          // 如若没有 从头开始播放
+          if (!historyItem) {
+            return this.befoIndex = 0;
+          }
+          // 若有 对请求得到的数据进行比较 尝试获取下标
+          const index = this.arrList.findIndex(e => e.src === historyItem.src);
+          this.befoIndex = index === -1 ? 0 : index;
+        }
+      })
+    },
+  },
+  // 组件中音频播放完成后的事件
+  storageIndex(item) {
+    // 为本地存储 lastPlay 下存储该条对象
+    uni.setStorageSync('lastPlay', JSON.stringify(item));
+  }
+}
 </script>
 ```
