@@ -29,6 +29,7 @@
 | imgSrc    |  音频对应的图片             |
 |directory  |  是否显示歌曲目录列表 |
 |dirHight   |  歌曲目录列表展示高度 |
+|lastSongIndex   |  指定当前播放目录下标的音频 |
 
 ## 事件向外提供
 
@@ -40,6 +41,7 @@
 |  timeupdate   | 音频持续播放事件                      |
 |  error        | 音频加载失败事件                      |
 |  ended        | 音频播放完成事件                      |
+|playChangeIndex|音频列表播放下标发生改变               |
 	
 	
 ## 使用演示
