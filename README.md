@@ -146,78 +146,72 @@ export default {
 #### 实现下次启动自动跳转到上次播放的音频
 ```
 <template>
-	<view>
-	 <smm-audio 
-    :srcList='arrList' 
-    :lastSongIndex='befoIndex' 
-    :directory="true" 
-    :dirHight="wh"
-	  @playChangeIndex='storageIndex'
-   ></smm-audio>
-	</view>
+  <view>
+    <smm-audio :srcList='arrList' :lastSongIndex='befoIndex' :directory="true" :dirHight="wh"
+      @playChangeIndex='storageIndex'></smm-audio>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				arrList: [],
-				wh: 0,
-				nowTime: 0,
-				// 上一个记录
-				befoIndex: 0
-			};
-		},
-		onLoad() {
-			// 获取设备信息
-			const info = uni.getSystemInfoSync();
-			// 为当前 可用高度对应变量进行赋值
-			this.wh = info.windowHeight - 100;
-		},
-		created() {
-			this.getSongList();
-		},
-		methods: {
-			getSongList() {
-				uni.request({
-					url: '网络请求接口',
-					method: 'GET',
-					success: ({
-						data: res
-					}) => {
-						this.arrList = res.map(function(item, index) {
-							let src = item.songUrl;
-							// let name = item.songName;
-							let name = `第 ${index + 1} 课`;
-							let singer = '张老师特别课程';
-							let imgSrc = 'xxx.jpg';
-             // 封装成 播放器支持的对象
-							return {
-								src,
-								name,
-								singer,
-								imgSrc
-							}
-						});
-            // 获取本地存储的最后播放的音频内容
-						const historyItem = JSON.parse(uni.getStorageSync('lastPlay') || '{}');
-            // 如若没有 从头开始播放
-						if (!historyItem) {
-							return this.befoIndex = 0;
-						}
-            // 若有 对请求得到的数据进行比较 尝试获取下标
-						const index = this.arrList.findIndex(e => e.src === historyItem.src);
-						this.befoIndex = index === -1 ? 0 : index;
-					}
-				})
-			},
-			},
-      // 组件中音频播放完成后的事件
-			storageIndex(item) {
-        // 为本地存储 lastPlay 下存储该条对象
-				uni.setStorageSync('lastPlay', JSON.stringify(item));
-			}
-		}
-	}
+export default {
+  data() {
+    return {
+      arrList: [],
+      wh: 0,
+      nowTime: 0,
+      // 上一个记录
+      befoIndex: 0
+    };
+  },
+  onLoad() {
+    // 获取设备信息
+    const info = uni.getSystemInfoSync();
+    // 为当前 可用高度对应变量进行赋值
+    this.wh = info.windowHeight - 100;
+  },
+  created() {
+    this.getSongList();
+  },
+  methods: {
+    getSongList() {
+      uni.request({
+        url: '网络请求接口',
+        method: 'GET',
+        success: ({
+          data: res
+        }) => {
+          this.arrList = res.map(function (item, index) {
+            let src = item.songUrl;
+            // let name = item.songName;
+            let name = `第 ${index + 1} 课`;
+            let singer = '张老师特别课程';
+            let imgSrc = 'xxx.jpg';
+            // 封装成 播放器支持的对象
+            return {
+              src,
+              name,
+              singer,
+              imgSrc
+            }
+          });
+          // 获取本地存储的最后播放的音频内容
+          const historyItem = JSON.parse(uni.getStorageSync('lastPlay') || '{}');
+          // 如若没有 从头开始播放
+          if (!historyItem) {
+            return this.befoIndex = 0;
+          }
+          // 若有 对请求得到的数据进行比较 尝试获取下标
+          const index = this.arrList.findIndex(e => e.src === historyItem.src);
+          this.befoIndex = index === -1 ? 0 : index;
+        }
+      })
+    },
+  },
+  // 组件中音频播放完成后的事件
+  storageIndex(item) {
+    // 为本地存储 lastPlay 下存储该条对象
+    uni.setStorageSync('lastPlay', JSON.stringify(item));
+  }
+}
 </script>
 ```
