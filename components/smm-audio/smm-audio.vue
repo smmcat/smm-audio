@@ -45,10 +45,13 @@
 				播放速度: x{{speed}}
 			</view>
 			<view class="loopPlayback" @click="loopPlayback=!loopPlayback">
-				循环播放: {{loopPlayback?'开':'关'}}
+				循环: {{loopPlayback?'开':'关'}}
 			</view>
 			<view class="lyric" @click="clearAllReadListIndex">
-				清除阅读历史
+				清除历史
+			</view>
+			<view class="lyric" style="background-color: rgba(10, 10, 10, .4);" @click="openLyricFn">
+				词
 			</view>
 		</view>
 		<view class="songListBox" v-if="srcList.length && directory" :style="{height:olddirHight+'px'}">
@@ -118,7 +121,7 @@
 				// 工具台切换
 				openMore: false,
 				olddirHight: this.dirHight,
-				loopPlayback: true
+				loopPlayback: true,
 			};
 		},
 		watch: {
@@ -137,9 +140,14 @@
 				}
 			},
 			nowAudioArrIndex(val) {
-				console.log(val);
+				// console.log(val);
 				this._putArrToAudioIndex(val);
 				this.$emit('playChangeIndex', this.srcList[val]);
+			},
+			newSeek(val) {
+				// console.log('newSeek 发生变化');
+				// console.log(val);
+				this.videoCtx.seek(this.nowTime + val > this.fullTime ? this.fullTime : this.nowTime + val );
 			}
 		},
 		// 界面传值
@@ -176,7 +184,10 @@
 				type: Number,
 				default: 0
 			},
-
+			newSeek: {
+				type: Number,
+				default: 0
+			}
 		},
 		created() {
 			// 获取 video 对象
@@ -292,7 +303,6 @@
 					// 如果用户点击的歌曲项目 已存在历史记录中
 					if (!this.overReadIndexList.includes(this.nowAudioArrIndex)) {
 						songData.push(this.srcList[this.nowAudioArrIndex]);
-						console.log(songData);
 						uni.setStorageSync('readOff', JSON.stringify(songData));
 
 						this.findReadoffIndex();
@@ -400,6 +410,9 @@
 						}
 					}
 				});
+			},
+			openLyricFn() {
+				this.$emit('openLyric', true);
 			}
 		},
 		filters: {
@@ -479,12 +492,14 @@
 		display: flex;
 		flex-direction: column;
 
+
 		.audioBox {
 			position: relative;
 			display: flex;
 			width: 100%;
 			height: 200rpx;
 			background-color: #ccc;
+			box-sizing: 2px 2px 5px #4e4e4e;
 
 			.videoPlay {
 				position: absolute;
@@ -496,7 +511,7 @@
 				position: relative;
 				width: 200rpx;
 				height: 200rpx;
-				background-color: #66ccff;
+				background-color: rgba(10, 10, 10, .4);
 				overflow: hidden;
 
 				image {
@@ -579,13 +594,13 @@
 					justify-content: space-between;
 					align-items: center;
 					height: 200rpx;
-					background-color: #4e4e4e;
+					background-color: #ccc;
 
 					.songTime {
 						font-size: 12px;
 						display: inline-block;
 						padding: 8rpx 20rpx;
-						background-color: #66cc;
+						background-color: #ca3e47;
 						border-radius: 10rpx;
 						white-space: nowrap;
 						color: #fff;
@@ -599,10 +614,10 @@
 					font-size: 12px;
 					justify-content: space-around;
 					align-items: center;
-					background-color: #4e4e4e;
+					background-color: transparent;
 
 					view {
-						background-color: darkorange;
+						background-color: #313131;
 						padding: 8rpx 15rpx;
 						color: #fff;
 						border-radius: 5rpx;
@@ -613,7 +628,7 @@
 					display: flex;
 					width: 60rpx;
 					height: 50rpx;
-					background-color: green;
+					background-color: rgba(10, 10, 10, .4);
 					font-size: 12px;
 					justify-content: center;
 					align-items: center;
@@ -643,7 +658,7 @@
 					position: relative;
 					padding: 20rpx 40rpx;
 					background-color: #fff;
-					box-shadow: 1px 0px 2px #4e4e4e;
+					box-shadow: 1px 0px 2px #414141;
 					border: 1px solid #ccc;
 					margin: 8rpx 0;
 					font-size: 15px;
@@ -675,7 +690,7 @@
 			height: 0rpx;
 			transition: all .3s;
 			border-bottom: 0px solid #000;
-			background-color: #ccc;
+			background-color: #414141;
 			overflow: hidden;
 
 			&.see {
@@ -691,7 +706,7 @@
 				padding: 10rpx 20rpx;
 				margin: 0 5px;
 				color: #fff;
-				background-color: orange;
+				background-color: #4e4e4e;
 			}
 
 			.lyric {
@@ -699,7 +714,7 @@
 				padding: 10rpx 20rpx;
 				margin: 0 5px;
 				color: #fff;
-				background-color: royalblue;
+				background-color: #4e4e4e;
 			}
 
 			.loopPlayback {
@@ -707,7 +722,7 @@
 				padding: 10rpx 20rpx;
 				margin: 0 5px;
 				color: #fff;
-				background-color: deepskyblue;
+				background-color: rgba(10, 10, 10, .4);
 			}
 		}
 	}
